@@ -117,17 +117,20 @@ echo -e "${YELLOW}⚙️ Configuration service systemd...${NC}"
 cat > "/etc/systemd/system/$SERVICE_NAME.service" << EOF
 [Unit]
 Description=Proxy.rs High-Performance Proxy Server
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=simple
 User=$SERVICE_USER
 WorkingDirectory=$DEPLOY_PATH
-ExecStart=$DEPLOY_PATH/target/release/proxy-rs serve --host 0.0.0.0 --port $PROXY_PORT --types HTTP HTTPS SOCKS4 SOCKS5
+ExecStart=$DEPLOY_PATH/target/release/proxy-rs serve --host 0.0.0.0 --port $PROXY_PORT --types HTTP HTTPS SOCKS4 SOCKS5 --max-tries 3
 Restart=always
-RestartSec=5
+RestartSec=10
 StandardOutput=journal
 StandardError=journal
+TimeoutStartSec=60
+Environment=RUST_LOG=info
 
 [Install]
 WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+http://httpheader.net/azenv.php
+https://httpbin.org/get?show_env
+http://azenv.net/
+http://proxyjudge.us
+https://www.proxyjudge.info
+http://www.proxy-listen.de/azenv.php
+http://mojeip.net.pl/asdfa/azenv.php
+https://httpheader.net/azenv.php
+http://pascal.hoez.free.fr/azenv.php
+http://www.9ravens.com/env.cgi

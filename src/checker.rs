@@ -138,11 +138,9 @@ pub async fn check_judges(ssl: bool, ext_ip: String, mut expected_types: Vec<Str
         );
     }
     if working == 0 || expected_types.into_iter().all(|f| no_judges.contains(&f)) {
-        log::error!("No judges found!");
-        while *DOWNLOADING.lock() {
-            continue;
-        }
-        // Return error instead of exiting to allow graceful handling
+        log::warn!("No judges found! Proxy validation disabled, but server will continue.");
+        log::info!("Server starting in proxy-only mode without automatic validation.");
+        // Don't return - allow server to start without judges for proxy functionality
         return;
     }
     log::info!("{} judges added, Runtime {:?}", working, stime.elapsed());
