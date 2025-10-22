@@ -65,13 +65,19 @@ apt install -y \
 echo -e "${YELLOW}🦀 Installation Rust toolchain...${NC}"
 if ! command -v cargo >/dev/null 2>&1; then
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
-        --profile default \
-        --component rustfmt clippy
+        --profile default
     export PATH="$HOME/.cargo/bin:$PATH"
     echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
 
+    # Attendre la fin de l'installation
+    sleep 2
+
     # Installer les composants additionnels
-    "$HOME/.cargo/bin/rustup" component add rustfmt clippy 2>/dev/null || true
+    if "$HOME/.cargo/bin/rustup" component add rustfmt clippy 2>/dev/null; then
+        echo -e "${GREEN}✅ Composants Rust additionnels installés${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Installation des composants optionnels (peut échouer)${NC}"
+    fi
 fi
 
 # Vérification installation Rust
