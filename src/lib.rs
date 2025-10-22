@@ -34,6 +34,7 @@ pub mod checker;
 pub mod proxy;
 pub mod dnsbl;
 pub mod judge;
+pub mod judge_optimized;
 pub mod resolver;
 pub mod negotiators;
 pub mod providers;

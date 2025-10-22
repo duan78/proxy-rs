@@ -14,7 +14,8 @@ const JUDGE_LOOKUP_TIMEOUT_SECS: u64 = 15;
 
 use crate::{
     dnsbl::{DnsblChecker, DnsblConfig},
-    judge::{check_judge_host, get_judges, Judge},
+    judge::Judge,
+    judge_optimized::{OptimizedJudgeManager, JudgeInfo},
     negotiators::{
         connect_25::Connect25Negotiator, connect_80::Connect80Negotiator, http::HttpNegotiator,
         https::HttpsNegotiator, socks4::Socks4Negotiator, socks5::Socks5Negotiator,
@@ -32,10 +33,16 @@ lazy_static! {
     static ref ENABLE_PROTOCOLS: Mutex<DashSet<String>> = Mutex::new(DashSet::new());
     static ref JUDGES: Arc<RwLock<std::collections::HashMap<String, Vec<Judge>>>> =
         Arc::new(RwLock::new(std::collections::HashMap::new()));
+    static ref OPTIMIZED_JUDGE_MANAGER: Arc<RwLock<OptimizedJudgeManager>> =
+        Arc::new(RwLock::new(OptimizedJudgeManager::new()));
 }
 
 pub async fn check_judges(ssl: bool, ext_ip: String, mut expected_types: Vec<String>) {
     let stime = time::Instant::now();
+
+    log::info!("🚀 Initialisation du système de judges optimisé...");
+
+    // Normaliser les types de protocoles
     if !expected_types.contains(&"SMTP".to_string())
         && expected_types.contains(&"CONNECT:25".to_string())
     {
@@ -50,100 +57,56 @@ pub async fn check_judges(ssl: bool, ext_ip: String, mut expected_types: Vec<Str
         expected_types.push("HTTP".to_string());
     }
 
-    let mut futures = FuturesUnordered::new();
-    let sem = Arc::new(Semaphore::new(DEFAULT_SEMAPHORE_LIMIT));
-
-    for mut judge in get_judges() {
-        let permit = Arc::clone(&sem).acquire_owned().await;
-        let expected_types = expected_types.clone();
-        let ext_ip = ext_ip.clone();
-        let ssl = ssl;
-        futures.push(tokio::spawn(async move {
-            let _ = permit;
-            if expected_types.contains(&judge.scheme) {
-                judge.verify_ssl = ssl;
-                check_judge_host(&mut judge, &ext_ip).await;
-            }
-            judge
-        }));
+    // Pré-tester tous les judges en parallèle
+    {
+        let mut manager = OPTIMIZED_JUDGE_MANAGER.write().await;
+        manager.pretest_judges(&ext_ip).await;
     }
 
-    let mut working = 0;
-    let no_judges = DashSet::new();
-    let disable_protocols = DashSet::new();
+    let mut working_count = 0;
+    let mut no_judges_protocols = Vec::new();
 
-    while let Some(Ok(judge)) = futures.next().await {
-        if judge.is_working {
-            {
-                let mut judges_map = JUDGES.write().await;
-                if !judges_map.contains_key(&judge.scheme) {
-                    judges_map.insert(judge.scheme.clone(), vec![]);
-                }
-                if let Some(v) = judges_map.get_mut(&judge.scheme) {
-                    v.push(judge);
-                    working += 1;
-                }
-            }
+    // Vérifier chaque protocole demandé
+    for protocol in &expected_types {
+        let manager = OPTIMIZED_JUDGE_MANAGER.read().await;
+
+        if let Some(judge) = manager.get_best_judge(protocol).await {
+            working_count += 1;
+
+            // Activer le protocole dans ENABLE_PROTOCOLS
+            ENABLE_PROTOCOLS.lock().extend(match protocol.as_str() {
+                "HTTP" => vec_of_strings!["HTTP", "CONNECT:80", "SOCKS4", "SOCKS5"],
+                "HTTPS" => vec_of_strings!["HTTPS"],
+                "SMTP" => vec_of_strings!["CONNECT:25"],
+                _ => vec![],
+            });
+
+            log::debug!("✅ Judge disponible pour {}: {} ({}ms)",
+                       protocol, judge.host, judge.response_time.as_millis());
         } else {
-            if expected_types.contains(&judge.scheme) {
-                no_judges.insert(judge.scheme.clone());
-            }
-
-            if judge.scheme == "HTTP" {
-                for protocol in vec_of_strings!["HTTP", "CONNECT:80", "SOCKS4", "SOCKS5"] {
-                    disable_protocols.insert(protocol);
-                }
-            } else if judge.scheme == "SMTP" {
-                let protocol = String::from("CONNECT:25");
-                disable_protocols.insert(protocol);
-            } else {
-                let protocol = String::from("HTTPS");
-                disable_protocols.insert(protocol);
-            }
+            no_judges_protocols.push(protocol.clone());
+            log::warn!("⚠️  Aucun judge disponible pour: {}", protocol);
         }
     }
 
-    for types in expected_types.iter() {
-        {
-            let judges_map = JUDGES.read().await;
-            if judges_map.contains_key(types) {
-            ENABLE_PROTOCOLS.lock().extend(match types.as_str() {
-                    "HTTP" => vec_of_strings!["HTTP", "CONNECT:80", "SOCKS4", "SOCKS5"],
-                    "HTTPS" => vec_of_strings!["HTTPS"],
-                    "SMTP" => vec_of_strings!["CONNECT:25"],
-                    _ => vec![],
-                });
-            }
-        }
-    }
-    let mut no_judges_vec = Vec::new();
-        for f in no_judges.iter() {
-            let k = f.to_string();
-            {
-                let judges_map = JUDGES.read().await;
-                if !judges_map.contains_key(&k) {
-                    no_judges_vec.push(k);
-                }
-            }
-        }
+    // Afficher les statistiques
+    let manager = OPTIMIZED_JUDGE_MANAGER.read().await;
+    let stats = manager.get_stats();
+    log::info!("🎯 Judges optimisés: {}", stats);
 
-    if !no_judges_vec.is_empty() {
-        log::warn!(
-            "Not found judges for the {:?} schemes. Checking proxy on protocols {:?} is disabled.",
-            no_judges_vec,
-            disable_protocols
-                .iter()
-                .map(|f| f.to_string())
-                .collect::<Vec<String>>(),
-        );
-    }
-    if working == 0 || expected_types.into_iter().all(|f| no_judges.contains(&f)) {
-        log::warn!("No judges found! Proxy validation disabled, but server will continue.");
-        log::info!("Server starting in proxy-only mode without automatic validation.");
-        // Don't return - allow server to start without judges for proxy functionality
+    if working_count == 0 {
+        log::warn!("❌ Aucun judge fonctionnel trouvé!");
+        log::warn!("⚠️  Le serveur démarrera en mode dégradé (sans validation automatique)");
         return;
     }
-    log::info!("{} judges added, Runtime {:?}", working, stime.elapsed());
+
+    if !no_judges_protocols.is_empty() {
+        log::warn!("⚠️  Protocoles sans judges: {:?}", no_judges_protocols);
+        log::info!("ℹ️  Ces protocoles seront désactivés pour la validation");
+    }
+
+    log::info!("🚀 {} judges optimisés opérationnels, Runtime: {:?}",
+               working_count, stime.elapsed());
 }
 
 #[derive(Clone, Debug)]

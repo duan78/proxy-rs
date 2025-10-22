@@ -43,6 +43,7 @@ mod checker;
 mod config;
 mod dnsbl;
 mod judge;
+mod judge_optimized;
 mod negotiators;
 mod performance;
 mod providers;
