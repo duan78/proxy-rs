@@ -126,7 +126,7 @@ cat > "$HOME/.cargo/config.toml" << 'CARGO_EOF'
 jobs = 1
 
 [target.x86_64-unknown-linux-gnu]
-rustflags = ["-C", "opt-level=2", "-C", "embed-bitcode=no"]
+rustflags = ["-C", "opt-level=2"]
 
 [profile.release]
 opt-level = "z"
@@ -151,7 +151,7 @@ fi
 # Compilation optimisée pour petits VPS
 echo "Compilation avec optimisation mémoire..."
 export CARGO_BUILD_JOBS=1
-export RUSTFLAGS="-C opt-level=2 -C embed-bitcode=no"
+export RUSTFLAGS="-C opt-level=2"
 cargo build --release
 
 # Nettoyer le swap temporaire

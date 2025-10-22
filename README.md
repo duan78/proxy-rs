@@ -397,6 +397,9 @@ cat > ~/.cargo/config.toml << 'EOF'
 [build]
 jobs = 1
 
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["-C", "opt-level=2"]
+
 [profile.release]
 opt-level = "z"
 lto = true
