@@ -77,3 +77,11 @@ cache/
 
 # Scripts de déploiement avec IPs sensibles
 deploy_custom.sh
+
+# Fichiers de tests temporaires
+test-*.sh
+judges.txt
+
+# Directoires temporaires
+.claude/
+/images/
