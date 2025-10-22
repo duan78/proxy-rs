@@ -376,6 +376,36 @@ Une fois l'installation terminée :
 
 ### ⚡ **Solutions aux problèmes courants**
 
+#### **Problème : "SIGKILL during compilation"**
+```bash
+# Solution 1 : Manque de mémoire - créer du swap
+sudo fallocate -l 2G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+# Relancer la compilation
+cargo build --release
+
+# Nettoyer après compilation
+sudo swapoff /swapfile
+sudo rm /swapfile
+
+# Solution 2 : Configuration cargo manuelle
+mkdir -p ~/.cargo
+cat > ~/.cargo/config.toml << 'EOF'
+[build]
+jobs = 1
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+EOF
+```
+
 #### **Problème : "Timeout error: no judges found"**
 ```bash
 # Solution 1 : Redémarrer avec timeout augmenté

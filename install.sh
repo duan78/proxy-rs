@@ -118,9 +118,48 @@ export PATH="$HOME/.cargo/bin:$PATH"
 echo "Nettoyage compilation précédente..."
 cargo clean
 
-# Compilation avec optimisations
-echo "Compilation avec support judges optimisés..."
-RUSTFLAGS="-C opt-level=3 -C target-cpu=native" cargo build --release
+# Configuration optimisée pour petits VPS (économie mémoire)
+echo "Configuration compilation pour petits VPS..."
+mkdir -p "$HOME/.cargo"
+cat > "$HOME/.cargo/config.toml" << 'CARGO_EOF'
+[build]
+jobs = 1
+
+[target.x86_64-unknown-linux-gnu]
+rustflags = ["-C", "opt-level=2", "-C", "embed-bitcode=no"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+CARGO_EOF
+
+# Créer swap temporaire si nécessaire (pour les petits VPS)
+if [[ $(free -m | awk 'NR==2{print $2}') -lt 2048 ]]; then
+    echo "Création swap temporaire pour compilation (petit VPS détecté)..."
+    fallocate -l 2G /tmp/swapfile 2>/dev/null || true
+    if [[ -f /tmp/swapfile ]]; then
+        chmod 600 /tmp/swapfile
+        mkswap /tmp/swapfile 2>/dev/null || true
+        swapon /tmp/swapfile 2>/dev/null || true
+        echo "Swap temporaire activé pour la compilation"
+    fi
+fi
+
+# Compilation optimisée pour petits VPS
+echo "Compilation avec optimisation mémoire..."
+export CARGO_BUILD_JOBS=1
+export RUSTFLAGS="-C opt-level=2 -C embed-bitcode=no"
+cargo build --release
+
+# Nettoyer le swap temporaire
+if [[ -f /tmp/swapfile ]]; then
+    swapoff /tmp/swapfile 2>/dev/null || true
+    rm -f /tmp/swapfile
+    echo "Swap temporaire nettoyé"
+fi
 
 # Vérification du binaire
 if [[ ! -f "target/release/proxy-rs" ]]; then
