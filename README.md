@@ -260,49 +260,88 @@ Threads: ~10-15 (vs 100+ Python processes)
 
 ## 🚀 Installation
 
-### ⚡ Installation One-Liner (Recommandé)
+### 🎯 Méthodes d'Installation Disponibles
+
+Proxy.rs offre **3 méthodes d'installation** adaptées à vos besoins :
+
+#### 1️⃣ **Installation VPS Production** (Recommandé)
 ```bash
+# Installation automatique complète sur serveur
 curl -sSL https://raw.githubusercontent.com/duan78/proxy-rs/main/install.sh | bash
 ```
+**Inclus :** Rust toolchain • Compilation optimisée • Service systemd • Firewall • Monitoring • Judges optimisés
 
-### 🚀 Installation VPS Production
-```bash
-# Script d'installation automatisée pour VPS
-curl -O https://raw.githubusercontent.com/duan78/proxy-rs/main/install.sh
-chmod +x install.sh
-sudo ./install.sh
-```
-
-### Prérequis Techniques
-
-- **Rust 1.81+** (testé sur Windows 10/11 et Linux Ubuntu/CentOS)
-- **Git 2.x** pour cloner le repository
-- **Serveur Linux** pour déploiement production (Ubuntu 20.04+, CentOS 8+)
-- **OpenSSL** pour support TLS/HTTPS
-- **Systemd** pour service management (production)
-
-### Installation Locale (Développement)
-
+#### 2️⃣ **Installation Locale (Développement)**
 ```bash
 # 1. Cloner le repository
 git clone https://github.com/duan78/proxy-rs.git
 cd proxy-rs
 
-# 2. Vérifier version Rust
-rustc --version  # Doit être 1.81+
+# 2. Démarrage rapide avec compilation automatique
+./quick-start.sh
+```
+**Inclus :** Compilation • Démarrage serveur • Judges optimisés • Configuration locale
 
-# 3. Compiler en mode release (optimisé)
+#### 3️⃣ **Installation Manuelle**
+```bash
+# 1. Prérequis
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.cargo/env
+
+# 2. Cloner et compiler
+git clone https://github.com/duan78/proxy-rs.git
+cd proxy-rs
 cargo build --release
 
-# 4. Vérifier l'installation
-./target/release/proxy-rs --help
-
-# 5. Tester les fonctionnalités
-./target/release/proxy-rs grab --limit 5
+# 3. Démarrer
+./target/release/proxy-rs --log info serve --host 127.0.0.1 --port 8080 --types HTTP HTTPS SOCKS4 SOCKS5
 ```
 
-### 📖 Guide d'Installation Complet
-👉 Voir [README_INSTALLATION.md](README_INSTALLATION.md) pour un guide détaillé
+### 📋 Scripts Disponibles
+
+| Script | Usage | Description |
+|--------|-------|-------------|
+| **`install.sh`** | VPS Production | Installation complète automatisée |
+| **`quick-start.sh`** | Développement Local | Démarrage rapide avec judges |
+| **`validate-installation.sh`** | Validation | Tests complets de l'installation |
+
+### 🔧 **Validation d'Installation**
+```bash
+# Après installation, valider le système
+./validate-installation.sh
+```
+**Teste :** Binaire • CLI • Découverte proxies • Serveur • Judges optimisés
+
+### 📋 **Prérequis Techniques**
+
+#### **Système**
+- **OS**: Ubuntu 20.04+, CentOS 8+, Debian 11+, Windows 10+
+- **Mémoire**: 2GB+ RAM (4GB+ recommandé pour production)
+- **CPU**: 2+ cœurs (4+ recommandé pour performance optimale)
+- **Stockage**: 1GB d'espace disque
+
+#### **Logiciels**
+- **Rust 1.81+** (installé automatiquement par les scripts)
+- **Git 2.x** pour cloner le repository
+- **OpenSSL** pour support TLS/HTTPS
+- **Systemd** pour service management (production uniquement)
+
+### 🌐 **Accès Après Installation**
+
+Une fois l'installation terminée :
+
+```bash
+# Sur VPS Production
+🌐 Proxy Server: http://VOTRE_IP:8080
+📊 API REST: http://VOTRE_IP:3000
+📚 Documentation: http://VOTRE_IP:3000/docs
+🏥 Health Check: http://VOTRE_IP:3000/api/v1/health
+
+# En développement local
+🌐 Proxy Server: http://localhost:8080
+📊 API REST: http://localhost:3000
+📚 Documentation: http://localhost:3000/docs
+```
 
 ## ⚡ Judges Optimisés
 
@@ -368,16 +407,10 @@ winget install Rustlang.Rust.MSVC
 ### Déploiement Production (Linux)
 
 ```bash
-# 1. Rendre les scripts exécutables
-chmod +x deploy.sh monitor.sh
+# Installation VPS complète automatisée
+curl -sSL https://raw.githubusercontent.com/duan78/proxy-rs/main/install.sh | bash
 
-# 2. Déployer automatiquement
-./deploy.sh
-
-# 3. Monitoring après déploiement
-./monitor.sh
-
-# 4. Vérifier statut service
+# Vérifier statut service après installation
 systemctl status proxy-rs
 ```
 
@@ -1752,9 +1785,9 @@ Host: target-website.com
 - **OpenSSL** (TLS support)
 - **Git** (source management)
 
-### 🔧 **Déploiement Automatisé**
+### 🔧 **Déploiement Automatisé avec install.sh**
 
-#### **Script Deploy.sh**
+#### **Script d'Installation Complet**
 ```bash
 #!/bin/bash
 # Script de déploiement production automatique
@@ -1842,36 +1875,33 @@ echo "🌐 API REST: http://$(hostname -I | awk '{print $1}'):3000"
 echo "📚 Documentation: http://$(hostname -I | awk '{print $1}'):3000/docs"
 ```
 
-#### **Monitoring Post-Déploiement**
+#### **Monitoring Intégré**
+Le monitoring est maintenant **intégré au script d'installation** et accessible via :
+
 ```bash
-#!/bin/bash
-# Script monitoring.sh
+# Logs temps réel
+journalctl -u proxy-rs -f
 
-echo "📊 Monitoring Proxy.rs Production..."
+# Métriques API REST
+curl http://localhost:3000/api/v1/metrics
 
-# Statut service
-echo "🔍 Statut service:"
-systemctl status proxy-rs --no-pager
+# Validation complète
+./validate-installation.sh
+```
 
-# Métriques API
-echo -e "\n📈 Métriques API:"
-curl -s http://localhost:3000/api/v1/health | jq '.data.status, .data.uptime_seconds'
-curl -s http://localhost://3000/api/v1/metrics | jq '.data.working_proxies, .data.success_rate'
+### 🔍 **Validation Déploiement Automatique**
 
-# Ressources système
-echo -e "\n💾 Utilisation ressources:"
-ps aux | grep proxy-rs | grep -v grep
-netstat -tuln | grep -E ':(8080|3000)'
+Le script d'installation inclut une **validation complète automatique** :
 
-# Logs récents
-echo -e "\n📝 Logs récents:"
-journalctl -u proxy-rs --since "5 minutes ago" --no-pager
-
-# Test proxy
-echo -e "\n🧪 Test proxy:"
-curl -x http://localhost:8080 -s https://httpbin.org/ip | jq '.origin'
-
-echo -e "\n✅ Monitoring complété!"
+```bash
+# Tests effectués automatiquement :
+✅ Binaire compilé et fonctionnel
+✅ CLI complète et opérationnelle
+✅ Système de judges optimisés intégré
+✅ Serveur proxy fonctionnel
+✅ API REST active
+✅ Firewall configuré
+✅ Service systemd actif
 ```
 
 ### 🔍 **Validation Déploiement**
@@ -2556,8 +2586,8 @@ Pour les requêtes enterprise, partenariats ou support premium :
 ### 🚀 **Prêt pour Production Immédiatement !**
 
 ```bash
-# Déploiement production en 2 commandes
-chmod +x deploy.sh && ./deploy.sh
+# Déploiement production en 1 commande
+curl -sSL https://raw.githubusercontent.com/duan78/proxy-rs/main/install.sh | bash
 
 # Accès instantané :
 # 🌐 Proxy Server: http://VOTRE_IP:8080
