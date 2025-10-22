@@ -326,6 +326,35 @@ cargo build --release
 - **OpenSSL** pour support TLS/HTTPS
 - **Systemd** pour service management (production uniquement)
 
+### 🔥 **Ports à Ouvrir (Firewall)**
+
+Pour un fonctionnement **plug & play**, assurez-vous que ces ports sont ouverts :
+
+#### **Ports Entrants (Inbound)**
+| Port | Protocole | Usage | Requis |
+|------|-----------|-------|---------|
+| **8080** | TCP | Serveur Proxy principal | ✅ **Obligatoire** |
+| **3000** | TCP | API REST & Documentation | ✅ **Recommandé** |
+| **22** | TCP | SSH (administration) | ✅ **Recommandé** |
+
+#### **Ports Sortants (Outbound)** - **IMPORTANT**
+| Port | Protocole | Usage | Requis |
+|------|-----------|-------|---------|
+| **80** | TCP | Judges HTTP (httpbin.org, etc.) | ✅ **Obligatoire** |
+| **443** | TCP | Judges HTTPS (validation) | ✅ **Obligatoire** |
+| **25** | TCP | Judges SMTP (optionnel) | ⚠️ **Optionnel** |
+| **53** | UDP/TCP | DNS (résolution noms) | ✅ **Obligatoire** |
+
+#### **Configuration Firewall Automatisée**
+```bash
+# Le script d'installation configure automatiquement :
+ufw allow 8080/tcp comment "Proxy.rs Server"
+ufw allow 3000/tcp comment "Proxy.rs API"
+ufw allow out 80/tcp comment "Judges HTTP"
+ufw allow out 443/tcp comment "Judges HTTPS"
+ufw allow out 53 comment "DNS"
+```
+
 ### 🌐 **Accès Après Installation**
 
 Une fois l'installation terminée :
@@ -341,6 +370,74 @@ Une fois l'installation terminée :
 🌐 Proxy Server: http://localhost:8080
 📊 API REST: http://localhost:3000
 📚 Documentation: http://localhost:3000/docs
+```
+
+## 🛠️ **Plug & Play - Dépannage Rapide**
+
+### ⚡ **Solutions aux problèmes courants**
+
+#### **Problème : "Timeout error: no judges found"**
+```bash
+# Solution 1 : Redémarrer avec timeout augmenté
+systemctl stop proxy-rs
+# Modifier la config pour augmenter les timeouts
+sed -i 's/timeout_ms = 8000/timeout_ms = 15000/' /etc/proxy-rs/proxy-rs.toml
+systemctl start proxy-rs
+
+# Solution 2 : Vérifier les ports sortants
+ufw status verbose
+ufw allow out 80,443,53
+
+# Solution 3 : Test manuel des judges
+curl -I --connect-timeout 10 https://httpbin.org/ip
+```
+
+#### **Problème : Service ne démarre pas**
+```bash
+# Vérifier les logs d'erreur
+journalctl -u proxy-rs --no-pager -n 20
+
+# Vérifier permissions
+ls -la /opt/proxy-rs/proxy-rs
+ls -la /etc/proxy-rs/
+
+# Redémarrer proprement
+systemctl daemon-reload
+systemctl restart proxy-rs
+```
+
+#### **Problème : Ports déjà utilisés**
+```bash
+# Vérifier les ports utilisés
+netstat -tuln | grep -E ':(8080|3000)'
+
+# Tuer les processus conflictuels
+sudo fuser -k 8080/tcp
+sudo fuser -k 3000/tcp
+
+# Relancer le service
+systemctl restart proxy-rs
+```
+
+### 🎯 **Checklist Plug & Play**
+```bash
+# ✅ Vérification complète post-installation
+echo "=== Vérification Proxy.rs Plug & Play ==="
+
+# 1. Service actif ?
+systemctl is-active proxy-rs && echo "✅ Service actif" || echo "❌ Service inactif"
+
+# 2. Ports écoutent ?
+netstat -tuln | grep :8080 && echo "✅ Port 8080 OK" || echo "❌ Port 8080 KO"
+netstat -tuln | grep :3000 && echo "✅ Port 3000 OK" || echo "❌ Port 3000 KO"
+
+# 3. API répond ?
+curl -s http://localhost:3000/api/v1/health | jq -r '.data.status' 2>/dev/null && echo "✅ API OK" || echo "❌ API KO"
+
+# 4. Proxy fonctionne ?
+curl -x http://localhost:8080 -s https://httpbin.org/ip | jq -r '.origin' 2>/dev/null && echo "✅ Proxy OK" || echo "⚠️ Proxy en cours d'initialisation"
+
+echo "=== Fin vérification ==="
 ```
 
 ## ⚡ Judges Optimisés

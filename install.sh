@@ -147,15 +147,15 @@ cat > "$CONFIG_PATH/proxy-rs.toml" << 'CONFIG_EOF'
 # ===========================================
 
 [general]
-max_connections = 5000
-default_timeout = 8
+max_connections = 2000
+default_timeout = 15
 log_level = "info"
 enable_metrics = true
-max_concurrent_checks = 5000
+max_concurrent_checks = 1000
 cleanup_interval = 300
-memory_limit_mb = 500
-max_avg_response_time_ms = 2000
-min_requests_for_filtering = 5
+memory_limit_mb = 1000
+max_avg_response_time_ms = 5000
+min_requests_for_filtering = 3
 
 [server]
 host = "0.0.0.0"
@@ -173,9 +173,9 @@ rate_limit = 1000
 enable_auth = false
 
 [dnsbl]
-enabled = true
-timeout_secs = 5
-max_concurrent = 10
+enabled = false
+timeout_secs = 10
+max_concurrent = 5
 cache_ttl_secs = 3600
 malicious_threshold = 2
 
@@ -211,13 +211,15 @@ file_path = "/var/log/proxy-rs/proxy-rs.log"
 max_file_size_mb = 100
 max_files = 5
 
-# Configuration judges optimisés (auto-géré)
+# Configuration judges optimisés (plug & play)
 [judges]
 enabled = true
-timeout_ms = 2000
-parallel_checks = 15
+timeout_ms = 8000
+parallel_checks = 8
 cache_results = true
-health_check_interval = 300
+health_check_interval = 600
+fallback_mode = true
+auto_recovery = true
 CONFIG_EOF
 
 chown "$SERVICE_USER:$SERVICE_USER" "$CONFIG_PATH/proxy-rs.toml"
