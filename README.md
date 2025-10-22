@@ -259,6 +259,19 @@ Threads: ~10-15 (vs 100+ Python processes)
 
 ## 🚀 Installation
 
+### ⚡ Installation One-Liner (Recommandé)
+```bash
+curl -sSL https://raw.githubusercontent.com/duan78/proxy-rs/main/install.sh | bash
+```
+
+### 🚀 Installation VPS Production
+```bash
+# Script d'installation automatisée pour VPS
+curl -O https://raw.githubusercontent.com/duan78/proxy-rs/main/install.sh
+chmod +x install.sh
+sudo ./install.sh
+```
+
 ### Prérequis Techniques
 
 - **Rust 1.81+** (testé sur Windows 10/11 et Linux Ubuntu/CentOS)
@@ -271,8 +284,8 @@ Threads: ~10-15 (vs 100+ Python processes)
 
 ```bash
 # 1. Cloner le repository
-git clone https://github.com/duan78/proxy.rs.git
-cd proxy.rs
+git clone https://github.com/duan78/proxy-rs.git
+cd proxy-rs
 
 # 2. Vérifier version Rust
 rustc --version  # Doit être 1.81+
@@ -286,6 +299,9 @@ cargo build --release
 # 5. Tester les fonctionnalités
 ./target/release/proxy-rs grab --limit 5
 ```
+
+### 📖 Guide d'Installation Complet
+👉 Voir [README_INSTALLATION.md](README_INSTALLATION.md) pour un guide détaillé
 
 ### Dépendances Système
 
