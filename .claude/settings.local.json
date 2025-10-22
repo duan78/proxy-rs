@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rustc:*)",
+      "Bash(cargo:*)",
+      "Bash(git --version:*)",
+      "Bash(rustup target list:*)",
+      "Bash(rustup toolchain list:*)",
+      "Bash(rustup toolchain install:*)",
+      "Bash(rustup target add:*)",
+      "Bash(wsl:*)",
+      "Bash(sh:*)",
+      "Bash(findstr:*)",
+      "Bash(rustup default:*)",
+      "Bash(timeout:*)",
+      "Bash(find:*)",
+      "Bash(./proxy_simple_demo:*)",
+      "WebSearch",
+      "Bash(dir:*)",
+      "Bash(del:*)",
+      "Bash(./target/release/proxy-rs:*)",
+      "Bash(git checkout:*)",
+      "Bash(chmod:*)",
+      "Bash(./target/release/proxy-rs.exe:*)",
+      "Bash(./target/debug/proxy-rs.exe:*)",
+      "Bash(curl:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(for:*)",
+      "Bash(do:*)",
+      "Bash(jq '.origin' echo \"\" done)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

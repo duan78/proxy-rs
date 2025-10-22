@@ -1,0 +1,25 @@
+[general]
+max_connections = 5000
+default_timeout = 8
+rate_limit_delay_ms = 500
+log_level = "info"
+
+[dnsbl]
+enabled = true
+timeout_secs = 5
+max_concurrent = 10
+cache_ttl_secs = 3600
+malicious_threshold = 2
+
+[server]
+max_clients = 1000
+port = 8080
+timeout = 30
+
+[protocols]
+http = true
+https = true
+socks4 = true
+socks5 = true
+connect_25 = true
+connect_80 = true

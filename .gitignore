@@ -1,0 +1,79 @@
+# Rust build artifacts
+/target/
+Cargo.lock
+**/*.rs.bk
+**/*.rlib
+**/*.pdb
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Log files
+*.log
+logs/
+
+# Configuration personnelle et sensible
+production.env
+personal_proxies.txt
+*.key
+*.pem
+*.crt
+
+# Build artifacts spécifiques
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test files temporaires
+test_proxies.txt
+temp_*
+*_test.*
+working_proxies.txt
+fresh_proxies.txt
+
+# Documentation build
+/docs/build/
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# Environment variables locales
+.env.local
+.env.*.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary directories
+tmp/
+temp/
+cache/
+
+# Monitoring files
+*.pid
+*.socket
+
+# SSL certificates (sauf exemples)
+*.key
+*.p12
+*.pem
+
+# Data directory
+/data/
+
+# Scripts de déploiement avec IPs sensibles
+deploy_custom.sh
