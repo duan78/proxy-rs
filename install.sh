@@ -186,15 +186,15 @@ cat > "$CONFIG_PATH/proxy-rs.toml" << 'CONFIG_EOF'
 # ===========================================
 
 [general]
-max_connections = 2000
-default_timeout = 15
+max_connections = 1500
+default_timeout = 30
 log_level = "info"
 enable_metrics = true
-max_concurrent_checks = 1000
-cleanup_interval = 300
-memory_limit_mb = 1000
-max_avg_response_time_ms = 5000
-min_requests_for_filtering = 3
+max_concurrent_checks = 500
+cleanup_interval = 600
+memory_limit_mb = 800
+max_avg_response_time_ms = 10000
+min_requests_for_filtering = 1
 
 [server]
 host = "0.0.0.0"
@@ -250,15 +250,61 @@ file_path = "/var/log/proxy-rs/proxy-rs.log"
 max_file_size_mb = 100
 max_files = 5
 
-# Configuration judges optimisés (plug & play)
+# Configuration judges auto-adaptatifs (plug & play universel)
 [judges]
 enabled = true
-timeout_ms = 8000
-parallel_checks = 8
+timeout_ms = 15000
+parallel_checks = 3
 cache_results = true
-health_check_interval = 600
+health_check_interval = 900
 fallback_mode = true
 auto_recovery = true
+auto_detect_environment = true
+graceful_degradation = true
+
+# Judges HTTP universels (fonctionnent partout)
+[[judges.http_judges]]
+url = "https://api.ipify.org"
+method = "GET"
+timeout_ms = 10000
+expected_status = 200
+priority = 1
+
+[[judges.http_judges]]
+url = "https://ifconfig.me/ip"
+method = "GET"
+timeout_ms = 12000
+expected_status = 200
+priority = 2
+
+[[judges.http_judges]]
+url = "https://ipinfo.io/ip"
+method = "GET"
+timeout_ms = 12000
+expected_status = 200
+priority = 3
+
+[[judges.http_judges]]
+url = "https://httpbin.org/ip"
+method = "GET"
+timeout_ms = 15000
+expected_status = 200
+priority = 4
+
+[[judges.http_judges]]
+url = "https://jsonip.com"
+method = "GET"
+timeout_ms = 12000
+expected_status = 200
+priority = 5
+
+# Judges SMTP (optionnels, ne bloquent pas si indisponibles)
+[[judges.smtp_judges]]
+host = "smtp.gmail.com"
+port = 587
+timeout_ms = 8000
+priority = 10
+optional = true
 CONFIG_EOF
 
 chown "$SERVICE_USER:$SERVICE_USER" "$CONFIG_PATH/proxy-rs.toml"
@@ -411,6 +457,18 @@ if timeout 15s curl -x "http://localhost:$PROXY_PORT" -s "https://httpbin.org/ip
 else
     echo -e "${YELLOW}⚠️  Proxy rotation en cours d'initialisation${NC}"
 fi
+
+# Configuration auto-adaptative post-installation
+echo -e "${YELLOW}🔧 Configuration auto-adaptative de l'environnement...${NC}"
+
+# Copier le script d'adaptation
+cp auto-adaptive-config.sh "$DEPLOY_PATH/"
+chmod +x "$DEPLOY_PATH/auto-adaptive-config.sh"
+chown "$SERVICE_USER:$SERVICE_USER" "$DEPLOY_PATH/auto-adaptive-config.sh"
+
+# Exécuter l'adaptation automatique
+echo "Lancement de l'adaptation automatique..."
+sudo -u "$SERVICE_USER" "$DEPLOY_PATH/auto-adaptive-config.sh"
 
 # Logs récents du service
 echo -e "${YELLOW}📝 Logs récents du service:${NC}"

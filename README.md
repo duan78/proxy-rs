@@ -269,7 +269,7 @@ Proxy.rs offre **3 méthodes d'installation** adaptées à vos besoins :
 # Installation automatique complète sur serveur
 curl -sSL https://raw.githubusercontent.com/duan78/proxy-rs/main/install.sh | bash
 ```
-**Inclus :** Rust toolchain • Compilation optimisée • Service systemd • Firewall • Monitoring • Judges optimisés
+**Inclus :** Rust toolchain • Compilation optimisée • Service systemd • Firewall • Monitoring • **Judges auto-adaptatifs** • **Configuration environnement automatique**
 
 #### 2️⃣ **Installation Locale (Développement)**
 ```bash
@@ -471,6 +471,79 @@ curl -s http://localhost:3000/api/v1/health | jq -r '.data.status' 2>/dev/null &
 curl -x http://localhost:8080 -s https://httpbin.org/ip | jq -r '.origin' 2>/dev/null && echo "✅ Proxy OK" || echo "⚠️ Proxy en cours d'initialisation"
 
 echo "=== Fin vérification ==="
+```
+
+## 🧠 **Système Judges Auto-Adaptatifs (Plug & Play Total)**
+
+Proxy.rs inclut un **système de judges intelligent** qui s'adapte automatiquement à votre environnement sans aucune configuration manuelle.
+
+### 🎯 **Fonctionnement Auto-Adaptatif**
+
+#### **1️⃣ Détection Environnement**
+```bash
+# Test automatique de la connectivité vers les services externes
+https://api.ipify.org    # Priorité 1 - Service IP le plus fiable
+https://ifconfig.me/ip   # Priorité 2 - Alternative rapide
+https://ipinfo.io/ip     # Priorité 3 - Service robuste
+https://httpbin.org/ip   # Priorité 4 - Service standard
+https://jsonip.com       # Priorité 5 - Dernière option
+```
+
+#### **2️⃣ Modes de Fonctionnement Automatiques**
+
+| Mode | Condition | Configuration | Résultat |
+|------|-----------|---------------|----------|
+| **🚀 Optimisé** | 4+ judges disponibles | Timeouts standards, parallélisme normal | Performance maximale |
+| **⚠️ Dégradé** | 1-3 judges disponibles | Timeouts augmentés, parallélisme réduit | Fonctionnement garanti |
+| **🔧 Local** | 0 judge disponible | Judges désactivés, proxy fonctionnel | Service limité mais stable |
+
+#### **3️⃣ Adaptation en Temps Réel**
+- ✅ **Test de connectivité** automatique à l'installation
+- ✅ **Configuration ajustée** selon environnement détecté
+- ✅ **Fallback automatique** si un judge devient indisponible
+- ✅ **Redémarrage intelligent** avec nouvelle configuration
+
+### 🛠️ **Processus d'Installation Auto-Adaptatif**
+
+```bash
+# L'installation devient complètement intelligente :
+curl -sSL https://raw.githubusercontent.com/duan78/proxy-rs/main/install.sh | bash
+
+# Ce qui se passe automatiquement :
+# 1. Installation standard du service
+# 2. Test de connectivité vers 5 judges externes
+# 3. Détection de l'environnement (VPS, restrictions réseau, etc.)
+# 4. Configuration automatique adaptée
+# 5. Redémarrage du service avec settings optimisés
+# 6. Validation finale du fonctionnement
+```
+
+### 📊 **Exemples d'Adaptation**
+
+#### **Cas 1 : VPS haute performance (AWS, DigitalOcean)**
+```toml
+# Résultat : Mode optimisé
+[judges]
+timeout_ms = 15000
+parallel_checks = 3
+# 4+ judges fonctionnels → Performance maximale
+```
+
+#### **Cas 2 : VPS restreint (IONOS, OVH)**
+```toml
+# Résultat : Mode dégradé
+[judges]
+timeout_ms = 20000
+parallel_checks = 1
+# 1-3 judges fonctionnels → Fonctionnement garanti
+```
+
+#### **Cas 3 : Réseau ultra-restreint**
+```toml
+# Résultat : Mode local
+[judges]
+enabled = false
+# 0 judge fonctionnel → Proxy sans validation (mais fonctionnel)
 ```
 
 ## ⚡ Judges Optimisés
