@@ -231,7 +231,7 @@ chown "$SERVICE_USER:$SERVICE_USER" "$DEPLOY_PATH/proxy-rs"
 
 # Service systemd avec sécurité renforcée
 echo -e "${YELLOW}⚙️ Configuration service systemd avec sécurité...${NC}"
-cat > "/etc/systemd/system/$SERVICE_NAME.service" << 'SERVICE_EOF'
+cat > "/etc/systemd/system/$SERVICE_NAME.service" << SERVICE_EOF
 [Unit]
 Description=Proxy.rs High-Performance Proxy Server with Optimized Judges v0.4.0
 After=network-online.target
