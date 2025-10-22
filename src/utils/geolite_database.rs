@@ -16,9 +16,9 @@ use super::http::{hyper_client, random_useragent};
 
 const GEOLITEDB: &str = "GeoLite2-City.mmdb";
 const GEOLITEDB_DOWNLOAD_URL: &str =
-    "https://raw.githubusercontent.com/zevtyardt/proxy.rs/main/data/GeoLite2-City.mmdb";
+    "https://raw.githubusercontent.com/duan78/proxy-rs/main/data/GeoLite2-City.mmdb";
 const GEOLITEDB_CHECKSUM_URL: &str =
-    "https://raw.githubusercontent.com/zevtyardt/proxy.rs/main/data/Geolite2-City.mmdb.checksum";
+    "https://raw.githubusercontent.com/duan78/proxy-rs/main/data/Geolite2-City.mmdb.checksum";
 
 lazy_static! {
     pub static ref DOWNLOADING: Mutex<bool> = Mutex::new(false);

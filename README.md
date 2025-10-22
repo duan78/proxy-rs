@@ -1,9 +1,9 @@
 # Proxy.rs
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/zevtyardt/proxy.rs)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/duan78/proxy-rs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust Version](https://img.shields.io/badge/rust-1.81+-orange.svg)](https://www.rust-lang.org)
-[![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)](https://github.com/zevtyardt/proxy.rs/releases)
+[![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)](https://github.com/duan78/proxy-rs/releases)
 [![API Documentation](https://img.shields.io/badge/API-Swagger_UI-green.svg)](http://127.0.0.1:3000/docs)
 
 🚀 **Proxy.rs v0.4.0** - Serveur de rotation de proxies ultra-rapide (15,000+ proxies/min) avec **API REST performante**, **hot-reload configuration** et **monitoring temps réel**. 75% moins gourmand que les alternatives Python. Conçu pour le scraping distribué, l'anonymat et la performance enterprise-grade avec **architecture microservices**.
@@ -271,7 +271,7 @@ Threads: ~10-15 (vs 100+ Python processes)
 
 ```bash
 # 1. Cloner le repository
-git clone https://github.com/zevtyardt/proxy.rs.git
+git clone https://github.com/duan78/proxy.rs.git
 cd proxy.rs
 
 # 2. Vérifier version Rust
@@ -2272,7 +2272,7 @@ max_concurrent = 20                 # Plus de parallélisme
 - **Documentation API**: http://VOTRE_IP:3000/docs
 - **Logs Service**: `journalctl -u proxy-rs -f`
 - **Configuration**: `/etc/proxy-rs/proxy-rs.toml`
-- **GitHub Issues**: [Report bugs et request features](https://github.com/zevtyardt/proxy.rs/issues)
+- **GitHub Issues**: [Report bugs et request features](https://github.com/duan78/proxy.rs/issues)
 
 #### **Diagnostic Automatique**
 ```bash
@@ -2326,7 +2326,7 @@ Nous apprécions toutes les contributions ! Voici comment participer :
 
 ```bash
 # 1. Cloner le repository
-git clone https://github.com/zevtyardt/proxy.rs.git
+git clone https://github.com/duan78/proxy.rs.git
 cd proxy.rs
 
 # 2. Installer Rust toolchain
@@ -2459,8 +2459,8 @@ Ce projet est sous licence **MIT** - voir le fichier [LICENSE](LICENSE) pour les
 
 ### 🆘 **Obtenir de l'Aide**
 
-- **📋 GitHub Issues**: [Rapporter bugs et demander features](https://github.com/zevtyardt/proxy.rs/issues)
-- **💬 GitHub Discussions**: [Discussions communautaires et Q&A](https://github.com/zevtyardt/proxy.rs/discussions)
+- **📋 GitHub Issues**: [Rapporter bugs et demander features](https://github.com/duan78/proxy.rs/issues)
+- **💬 GitHub Discussions**: [Discussions communautaires et Q&A](https://github.com/duan78/proxy.rs/discussions)
 - **📚 Documentation**: [Documentation API Rust](https://docs.rs/proxy-rs)
 - **📖 README**: Ce fichier avec exemples et troubleshooting
 
@@ -2473,7 +2473,7 @@ Pour les requêtes enterprise, partenariats ou support premium :
 
 ### 🔔 **Restez Informés**
 
-- **GitHub Releases**: [Suivre les nouvelles versions](https://github.com/zevtyardt/proxy.rs/releases)
+- **GitHub Releases**: [Suivre les nouvelles versions](https://github.com/duan78/proxy.rs/releases)
 - **Changelog**: [Historique des modifications](CHANGELOG.md)
 - **Roadmap**: [Futures développements](#️-roadmap-de-développement)
 

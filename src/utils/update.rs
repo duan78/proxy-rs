@@ -3,7 +3,7 @@ use hyper::Request;
 use http_body_util::{Empty, BodyExt};
 
 const GITHUB_CARGO_URL: &str =
-    "https://raw.githubusercontent.com/zevtyardt/proxy.rs/main/Cargo.toml";
+    "https://raw.githubusercontent.com/duan78/proxy-rs/main/Cargo.toml";
 
 pub async fn check_version() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let client = hyper_client();
@@ -34,7 +34,7 @@ Please update by running the following command:
 cargo install proxy-rs
 
 For more information, please visit:
-https://github.com/zevtyardt/proxy.rs
+https://github.com/duan78/proxy-rs
 ",
                         latest_version,
                         current_version

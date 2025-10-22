@@ -131,8 +131,8 @@ pub fn providers() -> Vec<Provider> {
         },
         /* github */
         Provider {
-            name: "github.com/zevtyardt/proxy-list",
-            url: "https://raw.githubusercontent.com/zevtyardt/proxy-list/main/all.txt",
+            name: "github.com/duan78/proxy-rs",
+            url: "https://raw.githubusercontent.com/duan78/proxy-rs/main/proxy_list.txt",
             ..Default::default()
         },
         Provider {

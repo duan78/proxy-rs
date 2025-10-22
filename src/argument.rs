@@ -3,7 +3,7 @@ use clap::{Args, Parser, Subcommand};
 
 // Constants
 const HELP_TEXT: &str = "Suggestions and bug reports are greatly appreciated:
-https://github.com/zevtyardt/proxy.rs/issues";
+https://github.com/duan78/proxy-rs/issues";
 
 #[derive(Parser, Debug, Clone)]
 #[command(after_help = HELP_TEXT)]
